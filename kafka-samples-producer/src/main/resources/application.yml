@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: kafka-telemetry-data-producer
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: "localhost:9092"
+        bindings:
+          telemetry-data-out-0:
+            producer:
+              configuration:
+                key.serializer: org.springframework.kafka.support.serializer.ToStringSerializer
+                value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      bindings:
+        telemetry-data-out-0:
+          producer:
+            useNativeEncoding: true
+          destination: nasa-space-probe-telemetry-data
