@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import java.util.*
+import kotlin.random.Random
 
 @Component
 class SampleDataGenerator(@Autowired val telemetryDataStreamBridge: TelemetryDataStreamBridge) {
@@ -12,7 +13,7 @@ class SampleDataGenerator(@Autowired val telemetryDataStreamBridge: TelemetryDat
     @Scheduled(initialDelay = 5000L, fixedRate = 1000L)
     fun emitSampleTelementryData() {
         val telemetryData = TelemetryData(
-            probeId = UUID.randomUUID().toString(),
+            probeId = Random.nextInt(10).toString(),
             currentSpeedMph = 41234.1,
             traveledDistanceFeet = 2232342342.3
         )

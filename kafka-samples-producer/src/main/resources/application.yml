@@ -11,7 +11,7 @@ spring:
             producer:
               configuration:
                 key.serializer: org.springframework.kafka.support.serializer.ToStringSerializer
-                value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+                value.serializer: org.springframework.kafka.support.serializer.ToStringSerializer
       bindings:
         telemetry-data-out-0:
           producer:

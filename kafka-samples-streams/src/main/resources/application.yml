@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: kafkastreamsexample
+  cloud:
+    function:
+      definition: handleStream
+    stream:
+      bindings:
+        handleStream-in-0:
+          destination: nasa-space-probe-telemetry-data
+        handleStream-out-0:
+          destination: out
+      kafka:
+        streams:
+          bindings:
+            handleStream-in-0.consumer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+            handleStream-out-0.producer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
