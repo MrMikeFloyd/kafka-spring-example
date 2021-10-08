@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: kafka-telemetry-data-consumer
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: "localhost:9092"
+        bindings:
+          telemetry-data-in-0:
+            consumer:
+              configuration:
+                key.deserializer: org.springframework.kafka.support.serializer.StringDeserializer
+                value.deserializer: org.springframework.kafka.support.serializer.StringDeserializer
+      bindings:
+        telemetry-data-in-0:
+          consumer:
+            useNativeEncoding: true
+          destination: nasa-space-probe-telemetry-data
