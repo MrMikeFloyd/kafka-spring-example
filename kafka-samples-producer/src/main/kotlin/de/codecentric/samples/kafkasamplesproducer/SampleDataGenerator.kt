@@ -11,11 +11,11 @@ class SampleDataGenerator(@Autowired val telemetryDataStreamBridge: TelemetryDat
 
     // Emit 1 telemetry data point ever 1s, wait for 5s for the application to settle
     @Scheduled(initialDelay = 5000L, fixedRate = 1000L)
-    fun emitSampleTelementryData() {
+    fun emitSampleTelemetryData() {
         val telemetryData = TelemetryData(
             probeId = Random.nextInt(10).toString(),
-            currentSpeedMph = 41234.1,
-            traveledDistanceFeet = 2232342342.3
+            currentSpeedMph = Random.nextDouble(0.0, 1000.0),
+            traveledDistanceFeet = Random.nextDouble(1.0, 10000.0)
         )
         telemetryDataStreamBridge.send(telemetryData)
     }
