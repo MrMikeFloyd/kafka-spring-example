@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.messaging.Message
 import java.util.function.Consumer
 
 @Configuration
@@ -13,14 +14,20 @@ class KafkaConsumerConfiguration {
     private val logger = KotlinLogging.logger {}
 
     @Bean
-    fun processTelemetryData(): Consumer<String> =
-        Consumer { telemetryRecord ->
+    fun processTelemetryData(): Consumer<Message<String>> =
+        Consumer { telemetryMessage ->
             try {
-                val telemetryDataInMetric = convertToMetricSystem(telemetryRecord)
-                logger.info { "Received Probe Telemetry data with maxSpeed ${telemetryDataInMetric.maxSpeedKph} KpH" +
-                        "and distance travelled ${telemetryDataInMetric.totalDistanceMetres} Meter" }
+                val telemetryDataInMetric = convertToMetricSystem(telemetryMessage.payload)
+                logger.info {
+                    "\nReceived telemetry data for probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}':" +
+                            "\n\tMax Speed: ${telemetryDataInMetric.maxSpeedKph} kph" +
+                            "\n\tTotal distance travelled: ${telemetryDataInMetric.totalDistanceMetres} meters"
+                }
             } catch (e: Exception) {
-                logger.error { "Error processing telemetry data: '$telemetryRecord'" }
+                logger.error {
+                    "Error processing telemetry data for probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}': " +
+                            "'${telemetryMessage.payload}'"
+                }
             }
         }
 
