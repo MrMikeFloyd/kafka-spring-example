@@ -17,7 +17,8 @@ class KafkaConsumerConfiguration {
         Consumer { telemetryRecord ->
             try {
                 val telemetryDataInMetric = convertToMetricSystem(telemetryRecord)
-                logger.info { "Received Probe Telemetry data: '$telemetryDataInMetric'" }
+                logger.info { "Received Probe Telemetry data with maxSpeed ${telemetryDataInMetric.maxSpeedKph} KpH" +
+                        "and distance travelled ${telemetryDataInMetric.totalDistanceMetres} Meter" }
             } catch (e: Exception) {
                 logger.error { "Error processing telemetry data: '$telemetryRecord'" }
             }

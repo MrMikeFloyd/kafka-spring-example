@@ -7,13 +7,13 @@ spring:
         binder:
           brokers: "localhost:9092"
         bindings:
-          telemetry-data-in-0:
+          processTelemetryData-in-0:
             consumer:
               configuration:
-                key.deserializer: org.springframework.kafka.support.serializer.StringDeserializer
-                value.deserializer: org.springframework.kafka.support.serializer.StringDeserializer
+                key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+                value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
       bindings:
-        telemetry-data-in-0:
+        processTelemetryData-in-0:
           consumer:
             useNativeEncoding: true
-          destination: nasa-space-probe-telemetry-data
+          destination: out
