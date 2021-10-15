@@ -5,15 +5,17 @@ spring:
     stream:
       kafka:
         binder:
-          brokers: "localhost:9092"
+          brokers: "localhost:29092"
         bindings:
           processTelemetryData-in-0:
             consumer:
               configuration:
+
                 key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
                 value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
       bindings:
         processTelemetryData-in-0:
           consumer:
             useNativeEncoding: true
+          group: ${spring.application.name}
           destination: space-probe-aggregate-telemetry-data
