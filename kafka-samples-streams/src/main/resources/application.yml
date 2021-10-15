@@ -1,15 +1,15 @@
 spring:
   application:
-    name: kafkastreamsexample
+    name: kafka-telemetry-data-aggregator
   cloud:
     function:
-      definition: handleStream
+      definition: aggregateTelemetryData
     stream:
       bindings:
         handleStream-in-0:
           destination: nasa-space-probe-telemetry-data
         handleStream-out-0:
-          destination: out
+          destination: space-probe-aggregate-telemetry-data
       kafka:
         streams:
           bindings:

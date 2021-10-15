@@ -9,5 +9,5 @@ import org.springframework.scheduling.annotation.EnableScheduling
 class KafkaSamplesProducerApplication
 
 fun main(args: Array<String>) {
-	runApplication<KafkaSamplesProducerApplication>(*args)
+    runApplication<KafkaSamplesProducerApplication>(*args)
 }

@@ -12,6 +12,20 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: localhost
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPICS: "nasa-space-probe-telemetry-data:3:1, out:3:1"
+      KAFKA_CREATE_TOPICS: "nasa-space-probe-telemetry-data:3:1, space-probe-aggregate-telemetry-data:3:1"
     ports:
       - 9092:9092
+  akhq:
+    image: tchiotludo/akhq
+    depends_on:
+      - kafka
+    environment:
+      AKHQ_CONFIGURATION: |
+        akhq:
+          connections:
+            wurstmeister-kafka:
+              properties:
+                bootstrap.servers: "localhost:9092"
+                default.api.timeout.ms: "60000"
+    ports:
+      - "9080:8080"

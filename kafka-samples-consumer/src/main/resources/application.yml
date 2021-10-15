@@ -16,4 +16,4 @@ spring:
         processTelemetryData-in-0:
           consumer:
             useNativeEncoding: true
-          destination: out
+          destination: space-probe-aggregate-telemetry-data

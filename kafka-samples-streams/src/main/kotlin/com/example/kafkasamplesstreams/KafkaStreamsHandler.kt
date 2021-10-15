@@ -1,6 +1,5 @@
 package com.example.kafkasamplesstreams
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KeyValue
@@ -13,63 +12,63 @@ import org.apache.kafka.streams.state.Stores
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
+const val STORE_NAME = "telemetryDataStore"
 
 @Configuration
 class KafkaStreamsHandler {
 
-    val storeName = "telemetryDataStore"
-
     @Bean
-    fun handleStream(): java.util.function.Function<KStream<String, String>, KStream<String, String>> {
+    fun aggregateTelemetryData(): java.util.function.Function<KStream<String, String>, KStream<String, String>> {
         return java.util.function.Function<KStream<String, String>, KStream<String, String>> {
-            it.transform({ StateStoreTransformer() }, storeName)
+            it.transform({ StateStoreTransformer() }, STORE_NAME)
         }
     }
 
     @Bean
-    fun myStore(): StoreBuilder<*>? {
+    fun aggregatedTelemetryDataStateStore(): StoreBuilder<*>? {
         return Stores.keyValueStoreBuilder(
-            Stores.persistentKeyValueStore(storeName), Serdes.String(),
-            Serdes.String())
+            Stores.persistentKeyValueStore(STORE_NAME), Serdes.String(),
+            Serdes.String()
+        )
     }
 
     inner class StateStoreTransformer : Transformer<String, String, KeyValue<String, String>> {
 
-        private var exampleStore: KeyValueStore<String, String>? = null
+        private var stateStore: KeyValueStore<String, String>? = null
 
         override fun init(context: ProcessorContext?) {
-            exampleStore = context!!.getStateStore(storeName) as KeyValueStore<String, String>
+            stateStore = context!!.getStateStore(STORE_NAME) as KeyValueStore<String, String>
         }
 
-        override fun transform(key: String?, value: String?): KeyValue<String, String> {
+        override fun transform(key: String, value: String): KeyValue<String, String> {
             // Calculate travelled distance and max speed per probe
-            val typeRef: TypeReference<HashMap<String, String>> = object : TypeReference<HashMap<String, String>>() {}
-            val newTelemetryData: MutableMap<String, String> = ObjectMapper().readValue(value, typeRef)
-            val lastMeasuredSpeedMph: Double = newTelemetryData["currentSpeedMph"]!!.toDouble()
-            val feetTravelledSinceLastMeasurement = newTelemetryData["traveledDistanceFeet"]!!.toDouble()
+            val telemetryData = TelemetryData(value, "currentSpeedMph", "traveledDistanceFeet")
+            var maxSpeed = telemetryData.speed
+            var sumDistance = telemetryData.distance
 
-            val valueFromStore = exampleStore!!.get(key)
-
-            var maxSpeedFromStore = 0.0
-            var aggregatedFeetFromStore = 0.0
-            if (valueFromStore != null) {
-                val aggregatedTelemetryData: MutableMap<String, String> =
-                    ObjectMapper().readValue(valueFromStore, typeRef)
-                maxSpeedFromStore = aggregatedTelemetryData["maxSpeed"]!!.toDouble()
-                aggregatedFeetFromStore = aggregatedTelemetryData["sumDistance"]!!.toDouble()
+            val stateStoreTelemetryData = stateStore!!.get(key)
+            if (stateStoreTelemetryData != null) {
+                val aggregatedTelemetryData = TelemetryData(stateStoreTelemetryData, "maxSpeed", "sumDistance")
+                maxSpeed = if (telemetryData.speed > aggregatedTelemetryData.speed) telemetryData.speed else aggregatedTelemetryData.speed
+                sumDistance = telemetryData.distance + aggregatedTelemetryData.distance
             }
+            val aggregatedTelemetryData = convertToJson(maxSpeed, sumDistance)
 
-            val sumDistance = feetTravelledSinceLastMeasurement + aggregatedFeetFromStore
-            val maxSpeed = if (lastMeasuredSpeedMph > maxSpeedFromStore) lastMeasuredSpeedMph else maxSpeedFromStore
+            stateStore!!.put(key, aggregatedTelemetryData)
+            return KeyValue(key, aggregatedTelemetryData)
+        }
 
-            val output = ObjectMapper().writeValueAsString(mapOf("sumDistance" to sumDistance.toString(),
-                "maxSpeed" to maxSpeed.toString()))
-            exampleStore!!.put(key, output)
-            return KeyValue(key, output)
+        private fun convertToJson(speed: Double, distance: Double): String {
+            return ObjectMapper().writeValueAsString(
+                mapOf(
+                    "maxSpeed" to speed.toString(),
+                    "sumDistance" to distance.toString()
+                )
+            )
         }
 
         override fun close() {
-            exampleStore!!.close()
+            stateStore!!.close()
         }
 
     }
