@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 data class AggregatedTelemetryData(
     @JsonProperty("probeId")
-    val probeId: String?,
+    val probeId: String,
     @JsonProperty("maxSpeedMph")
     val maxSpeedMph: Double,
     @JsonProperty("traveledDistanceFeet")

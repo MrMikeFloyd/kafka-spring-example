@@ -3,6 +3,7 @@ package com.example.kafkasamplesstreams
 import com.example.kafkasamplesstreams.events.AggregatedTelemetryData
 import com.example.kafkasamplesstreams.events.TelemetryDataPoint
 import com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+import mu.KotlinLogging
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.KeyValue
 import org.apache.kafka.streams.kstream.KStream
@@ -18,6 +19,8 @@ const val STORE_NAME = "telemetryDataStore"
 
 @Configuration
 class KafkaStreamsHandler {
+
+    private val logger = KotlinLogging.logger {}
 
     @Bean
     fun aggregateTelemetryData(): java.util.function.Function<
@@ -45,6 +48,7 @@ class KafkaStreamsHandler {
 
         override fun init(context: ProcessorContext?) {
             stateStore = context!!.getStateStore(STORE_NAME) as KeyValueStore<String, AggregatedTelemetryData>
+            logger.info { "Initialized State Store with ${stateStore!!.approximateNumEntries()} entries." }
         }
 
         /**
