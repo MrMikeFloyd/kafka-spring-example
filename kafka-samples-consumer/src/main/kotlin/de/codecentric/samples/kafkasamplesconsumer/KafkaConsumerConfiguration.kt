@@ -12,7 +12,7 @@ class KafkaConsumerConfiguration {
     private val logger = KotlinLogging.logger {}
 
     @Bean
-    fun processTelemetryData(): Consumer<Message<String>> =
+    fun processTelemetryData(): Consumer<Message<ImperialTelemetryData>> =
         Consumer { telemetryMessage ->
             try {
                 val metricTelemetryData = MetricTelemetryData(telemetryMessage.payload)
