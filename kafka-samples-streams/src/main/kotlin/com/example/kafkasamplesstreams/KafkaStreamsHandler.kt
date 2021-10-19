@@ -63,7 +63,7 @@ class KafkaStreamsHandler {
                     val initialAggregatedTelemetryData = AggregatedTelemetryData(
                         value.probeId,
                         value.currentSpeedMph,
-                        value.traveledDistanceFeet // TODO: Why do we never end up in this branch? Why is there always smth returned from the state store?
+                        value.traveledDistanceFeet
                     )
                     stateStore!!.put(key, initialAggregatedTelemetryData)
                     KeyValue(key, initialAggregatedTelemetryData)
