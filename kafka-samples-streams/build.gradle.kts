@@ -29,6 +29,8 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams:3.1.4")
     implementation("io.confluent:kafka-streams-avro-serde:6.2.0")
     implementation("io.github.microutils:kotlin-logging:2.0.11")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 }
 
 tasks.withType<KotlinCompile> {
