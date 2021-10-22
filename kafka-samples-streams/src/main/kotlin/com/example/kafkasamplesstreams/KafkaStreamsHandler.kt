@@ -29,7 +29,9 @@ class KafkaStreamsHandler {
         return java.util.function.Function<
                 KStream<String, TelemetryDataPoint>,
                 KStream<String, AggregatedTelemetryData>> {
-            it.transform({ StateStoreTransformer() }, STORE_NAME)
+            it
+                .transform({ StateStoreTransformer() }, STORE_NAME)
+                .filter { _, value -> value != null }
         }
     }
 
@@ -64,35 +66,43 @@ class KafkaStreamsHandler {
          * created aggregate telemetry data record is passed on downstream.
          */
         override fun transform(key: String, value: TelemetryDataPoint): KeyValue<String, AggregatedTelemetryData> {
-            return when (val stateStoreTelemetryData = stateStore!!.get(key)) {
-                null -> {
-                    // No data in state store for the given probe => initialize it
-                    val initialAggregatedTelemetryData = AggregatedTelemetryData(
-                        probeId = value.probeId,
-                        maxSpeedMph = value.currentSpeedMph,
-                        traveledDistanceFeet = value.traveledDistanceFeet
-                    )
-                    stateStore!!.put(key, initialAggregatedTelemetryData)
-                    KeyValue(key, initialAggregatedTelemetryData)
+            try {
+                return when (val stateStoreTelemetryData = stateStore!!.get(key)) {
+                    null -> {
+                        // No data in state store for the given probe => initialize it
+                        val initialAggregatedTelemetryData = AggregatedTelemetryData(
+                            probeId = value.probeId,
+                            maxSpeedMph = value.currentSpeedMph,
+                            traveledDistanceFeet = value.traveledDistanceFeet
+                        )
+                        stateStore!!.put(key, initialAggregatedTelemetryData)
+                        KeyValue(key, initialAggregatedTelemetryData)
+                    }
+                    else -> {
+                        // State store has data for the given  probe => update it with the current measurement's data
+                        val totalDistanceTraveled =
+                            value.traveledDistanceFeet + stateStoreTelemetryData.traveledDistanceFeet
+                        val maxSpeed = if (value.currentSpeedMph > stateStoreTelemetryData.maxSpeedMph)
+                            value.currentSpeedMph else stateStoreTelemetryData.maxSpeedMph
+                        val aggregatedTelemetryData = AggregatedTelemetryData(
+                            probeId = value.probeId,
+                            maxSpeedMph = maxSpeed,
+                            traveledDistanceFeet = totalDistanceTraveled
+                        )
+                        stateStore!!.put(key, aggregatedTelemetryData)
+                        return KeyValue(key, aggregatedTelemetryData)
+                    }
                 }
-                else -> {
-                    // State store has data for the given  probe => update it with the current measurement's data
-                    val totalDistanceTraveled =
-                        value.traveledDistanceFeet + stateStoreTelemetryData.traveledDistanceFeet
-                    val maxSpeed = if (value.currentSpeedMph > stateStoreTelemetryData.maxSpeedMph)
-                        value.currentSpeedMph else stateStoreTelemetryData.maxSpeedMph
-                    val aggregatedTelemetryData = AggregatedTelemetryData(
-                        probeId = value.probeId,
-                        maxSpeedMph = maxSpeed,
-                        traveledDistanceFeet = totalDistanceTraveled
-                    )
-                    stateStore!!.put(key, aggregatedTelemetryData)
-                    return KeyValue(key, aggregatedTelemetryData)
-                }
+            } catch (e: Exception) {
+                // Handle non deserialization errors. Could send to DLQ (by injecting SendToDlqAndContinue) - we won't bother here.
+                logger.error { "Encountered an error while processing record with key $key - ignoring it. Error: '${e}'" }
+                e.printStackTrace()
+                return KeyValue(key, null)
             }
         }
 
         override fun close() {
+            // Nothing to do here; Streams will handle closing everything for us
         }
 
     }
