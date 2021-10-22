@@ -1,6 +1,7 @@
 spring:
   application:
     name: kafka-telemetry-data-consumer
+  kafka.properties.spring.json.use.type.headers: false
   cloud:
     stream:
       kafka:
@@ -10,9 +11,8 @@ spring:
           processTelemetryData-in-0:
             consumer:
               configuration:
-
                 key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-                value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+                value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
       bindings:
         processTelemetryData-in-0:
           consumer:

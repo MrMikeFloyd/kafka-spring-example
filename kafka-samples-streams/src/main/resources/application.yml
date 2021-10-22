@@ -1,4 +1,5 @@
 spring:
+  kafka.properties.spring.json.use.type.headers: false
   application:
     name: kafka-telemetry-data-aggregator
   cloud:
@@ -17,7 +18,7 @@ spring:
           bindings:
             aggregateTelemetryData-in-0.consumer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-              valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.TelemetryDataPointSerde
             aggregateTelemetryData-out-0.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-              valueSerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde

@@ -12,6 +12,7 @@ spring:
               configuration:
                 key.serializer: org.springframework.kafka.support.serializer.ToStringSerializer
                 value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+                spring.json.add.type.headers: false
       bindings:
         telemetry-data-out-0:
           producer:

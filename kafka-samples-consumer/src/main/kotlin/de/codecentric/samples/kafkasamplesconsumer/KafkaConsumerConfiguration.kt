@@ -1,5 +1,7 @@
 package de.codecentric.samples.kafkasamplesconsumer
 
+import de.codecentric.samples.kafkasamplesconsumer.event.ImperialTelemetryData
+import de.codecentric.samples.kafkasamplesconsumer.event.MetricTelemetryData
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -12,7 +14,7 @@ class KafkaConsumerConfiguration {
     private val logger = KotlinLogging.logger {}
 
     @Bean
-    fun processTelemetryData(): Consumer<Message<String>> =
+    fun processTelemetryData(): Consumer<Message<ImperialTelemetryData>> =
         Consumer { telemetryMessage ->
             try {
                 val metricTelemetryData = MetricTelemetryData(telemetryMessage.payload)
