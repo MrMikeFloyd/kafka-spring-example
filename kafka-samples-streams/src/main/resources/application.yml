@@ -19,6 +19,7 @@ spring:
             aggregateTelemetryData-in-0.consumer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.TelemetryDataPointSerde
+              deserializationExceptionHandler: logAndContinue
             aggregateTelemetryData-out-0.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
