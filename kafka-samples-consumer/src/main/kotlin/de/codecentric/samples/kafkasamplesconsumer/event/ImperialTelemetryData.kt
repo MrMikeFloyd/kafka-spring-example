@@ -1,4 +1,4 @@
-package de.codecentric.samples.kafkasamplesconsumer
+package de.codecentric.samples.kafkasamplesconsumer.event
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

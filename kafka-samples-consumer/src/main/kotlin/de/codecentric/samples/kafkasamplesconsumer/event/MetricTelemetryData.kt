@@ -1,4 +1,4 @@
-package de.codecentric.samples.kafkasamplesconsumer
+package de.codecentric.samples.kafkasamplesconsumer.event
 
 class MetricTelemetryData(telemetryData: ImperialTelemetryData) {
 

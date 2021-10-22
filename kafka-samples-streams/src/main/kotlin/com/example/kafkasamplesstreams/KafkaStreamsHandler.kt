@@ -36,19 +36,26 @@ class KafkaStreamsHandler {
     @Bean
     fun aggregatedTelemetryDataStateStore(): StoreBuilder<*>? {
         return Stores.keyValueStoreBuilder(
-            Stores.persistentKeyValueStore(STORE_NAME),
+            /**
+             * Choosing an inMemory Store ensures that the kafka streams application
+             * doesn't store any data on disk (via RocksDb) and our state is clear
+             * when we delete the changelog topic and restart our application
+             **/
+            Stores.inMemoryKeyValueStore(STORE_NAME),
             Serdes.String(),
             AggregateTelemetryDataSerde()
         )
     }
 
-    inner class StateStoreTransformer : Transformer<String, TelemetryDataPoint, KeyValue<String, AggregatedTelemetryData>> {
+    inner class StateStoreTransformer :
+        Transformer<String, TelemetryDataPoint, KeyValue<String, AggregatedTelemetryData>> {
 
         private var stateStore: KeyValueStore<String, AggregatedTelemetryData>? = null
 
         override fun init(context: ProcessorContext?) {
             stateStore = context!!.getStateStore(STORE_NAME) as KeyValueStore<String, AggregatedTelemetryData>
             logger.info { "Initialized State Store with ${stateStore!!.approximateNumEntries()} entries." }
+            stateStore!!.all().forEachRemaining { logger.info { it.value } }
         }
 
         /**
@@ -61,22 +68,23 @@ class KafkaStreamsHandler {
                 null -> {
                     // No data in state store for the given probe => initialize it
                     val initialAggregatedTelemetryData = AggregatedTelemetryData(
-                        value.probeId,
-                        value.currentSpeedMph,
-                        value.traveledDistanceFeet
+                        probeId = value.probeId,
+                        maxSpeedMph = value.currentSpeedMph,
+                        traveledDistanceFeet = value.traveledDistanceFeet
                     )
                     stateStore!!.put(key, initialAggregatedTelemetryData)
                     KeyValue(key, initialAggregatedTelemetryData)
                 }
                 else -> {
                     // State store has data for the given  probe => update it with the current measurement's data
-                    val totalDistanceTraveled = value.traveledDistanceFeet + stateStoreTelemetryData.traveledDistanceFeet
+                    val totalDistanceTraveled =
+                        value.traveledDistanceFeet + stateStoreTelemetryData.traveledDistanceFeet
                     val maxSpeed = if (value.currentSpeedMph > stateStoreTelemetryData.maxSpeedMph)
                         value.currentSpeedMph else stateStoreTelemetryData.maxSpeedMph
                     val aggregatedTelemetryData = AggregatedTelemetryData(
-                        value.probeId,
-                        totalDistanceTraveled,
-                        maxSpeed
+                        probeId = value.probeId,
+                        maxSpeedMph = maxSpeed,
+                        traveledDistanceFeet = totalDistanceTraveled
                     )
                     stateStore!!.put(key, aggregatedTelemetryData)
                     return KeyValue(key, aggregatedTelemetryData)
@@ -85,7 +93,6 @@ class KafkaStreamsHandler {
         }
 
         override fun close() {
-            stateStore!!.close()
         }
 
     }

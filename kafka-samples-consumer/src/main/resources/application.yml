@@ -12,7 +12,7 @@ spring:
             consumer:
               configuration:
                 key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-                value.deserializer: de.codecentric.samples.kafkasamplesconsumer.TelemetryDataDeserializer
+                value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
       bindings:
         processTelemetryData-in-0:
           consumer:

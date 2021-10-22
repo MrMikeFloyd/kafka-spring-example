@@ -1,5 +1,7 @@
 package de.codecentric.samples.kafkasamplesconsumer
 
+import de.codecentric.samples.kafkasamplesconsumer.event.ImperialTelemetryData
+import de.codecentric.samples.kafkasamplesconsumer.event.MetricTelemetryData
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
