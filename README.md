@@ -2,7 +2,7 @@
 
 This sample project illustrates  different ways to integrate Spring with Kafka.
 
-## Fictitous use case
+## Fictitious use case
 
 We are helping a european space agency to set up their telemetry data receivers. Therefore we need to keep track of the telemetry data we receive from the various space probes that are roaming the solar system (and beyond!). The problem is: All of the space probes send their telemetry data using imperial units. Our client systems use the metric system, though. As we learned from [the Mars Climate Orbiter fail](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter), we need to take care of this before the probe goes down in a flaming fireball. We need to:
 

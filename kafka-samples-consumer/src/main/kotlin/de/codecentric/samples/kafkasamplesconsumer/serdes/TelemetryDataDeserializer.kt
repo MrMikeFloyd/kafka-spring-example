@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package de.codecentric.samples.kafkasamplesconsumer.serdes
 
 import de.codecentric.samples.kafkasamplesconsumer.event.ImperialTelemetryData

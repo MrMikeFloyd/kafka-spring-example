@@ -3,7 +3,7 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper
     ports:
-      - 2181:2181
+      - "2181:2181"
   kafka:
     image: wurstmeister/kafka
     links:
@@ -16,7 +16,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_CREATE_TOPICS: "nasa-space-probe-telemetry-data:3:1, space-probe-aggregate-telemetry-data:3:1"
     ports:
-      - 29092:29092
+      - "29092:29092"
   akhq:
     image: tchiotludo/akhq
     depends_on:
