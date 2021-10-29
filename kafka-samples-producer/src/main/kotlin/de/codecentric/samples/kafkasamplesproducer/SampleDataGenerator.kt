@@ -1,5 +1,6 @@
 package de.codecentric.samples.kafkasamplesproducer
 
+import de.codecentric.samples.kafkasamplesproducer.event.TelemetryData
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

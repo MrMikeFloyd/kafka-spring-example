@@ -19,16 +19,12 @@ extra["springCloudVersion"] = "2020.0.4"
 
 dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.apache.kafka:kafka-streams")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	implementation("org.springframework.cloud:spring-cloud-stream")
 	implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka")
-	implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka-streams")
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("io.github.microutils:kotlin-logging:2.0.11")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.springframework.kafka:spring-kafka-test")
 }
 
 dependencyManagement {

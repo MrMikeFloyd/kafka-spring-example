@@ -1,5 +1,6 @@
 package de.codecentric.samples.kafkasamplesproducer
 
+import de.codecentric.samples.kafkasamplesproducer.event.TelemetryData
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.function.StreamBridge

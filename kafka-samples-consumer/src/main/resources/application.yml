@@ -1,6 +1,7 @@
 spring:
   application:
     name: kafka-telemetry-data-consumer
+  # Ignore type headers in kafka message
   kafka.properties.spring.json.use.type.headers: false
   cloud:
     stream:
@@ -8,6 +9,7 @@ spring:
         binder:
           brokers: "localhost:29092"
         bindings:
+          # this has to match the consumer bean name with suffix in-0 (for consumer)
           processTelemetryData-in-0:
             consumer:
               configuration:
@@ -15,7 +17,5 @@ spring:
                 value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
       bindings:
         processTelemetryData-in-0:
-          consumer:
-            useNativeEncoding: true
           group: ${spring.application.name}
           destination: space-probe-aggregate-telemetry-data

@@ -1,4 +1,4 @@
-package de.codecentric.samples.kafkasamplesproducer
+package de.codecentric.samples.kafkasamplesproducer.event
 
 import java.time.ZonedDateTime.now
 
