@@ -43,4 +43,8 @@ You can run it by executing the following commands:
 
 The sample producer will emit a sample telemetry record for one of 10 different arbitrary probes every second (waiting for 5s after Spring context startup), so you should see the first aggregated telemetry records come in after a few seconds.
 
+## Further information
+
+If you want to have a look at the Streams Topology used in this sample, you find a visualization in the `doc` subdirectory. Generate your own [via Spring Boot Actuator](http://localhost:8080/actuator/kafkastreamstopology/kafka-telemetry-data-aggregator) and the excellent [Kafka Streams Topology Visualizer](https://zz85.github.io/kafka-streams-viz/).
+
 Have fun!
