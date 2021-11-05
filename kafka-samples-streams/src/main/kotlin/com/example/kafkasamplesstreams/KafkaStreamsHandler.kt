@@ -1,10 +1,12 @@
 package com.example.kafkasamplesstreams
 
 import com.example.kafkasamplesstreams.events.AggregatedTelemetryData
+import com.example.kafkasamplesstreams.events.SpaceAgency
 import com.example.kafkasamplesstreams.events.TelemetryDataPoint
 import com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.kstream.KStream
+import org.apache.kafka.streams.kstream.Predicate
 import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.streams.state.StoreBuilder
 import org.apache.kafka.streams.state.Stores
@@ -19,11 +21,15 @@ class KafkaStreamsHandler {
     @Bean
     fun aggregateTelemetryData(): java.util.function.Function<
             KStream<String, TelemetryDataPoint>,
-            KStream<String, AggregatedTelemetryData>> {
+            Array<KStream<String, AggregatedTelemetryData>>> {
         return java.util.function.Function<
                 KStream<String, TelemetryDataPoint>,
-                KStream<String, AggregatedTelemetryData>> {
+                Array<KStream<String, AggregatedTelemetryData>>> {
             it.transform({ TelemetryAggregationTransformer() }, STORE_NAME)
+                .branch(
+                    Predicate { _, v -> v.spaceAgency == SpaceAgency.NASA },
+                    Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA }
+                )
         }
     }
 

@@ -32,7 +32,8 @@ class TelemetryAggregationTransformer :
                 val initialAggregatedTelemetryData = AggregatedTelemetryData(
                     probeId = value.probeId,
                     maxSpeedMph = value.currentSpeedMph,
-                    traveledDistanceFeet = value.traveledDistanceFeet
+                    traveledDistanceFeet = value.traveledDistanceFeet,
+                    spaceAgency = value.spaceAgency
                 )
                 updateStoreAndForwardData(initialAggregatedTelemetryData)
             }
@@ -45,7 +46,8 @@ class TelemetryAggregationTransformer :
                 val aggregatedTelemetryData = AggregatedTelemetryData(
                     probeId = value.probeId,
                     maxSpeedMph = maxSpeed,
-                    traveledDistanceFeet = totalDistanceTraveled
+                    traveledDistanceFeet = totalDistanceTraveled,
+                    spaceAgency = value.spaceAgency
                 )
                 logger.info {
                     "Calculated new aggregated telemetry data for probe $key. New max speed: ${aggregatedTelemetryData.maxSpeedMph} and " +

@@ -10,12 +10,23 @@ spring:
           brokers: "localhost:29092"
         bindings:
           # this has to match the consumer bean name with suffix in-0 (for consumer)
-          processTelemetryData-in-0:
+          processNasaTelemetryData-in-0:
+            consumer:
+              configuration:
+                key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+                value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
+          processEsaTelemetryData-in-0:
             consumer:
               configuration:
                 key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
                 value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
       bindings:
-        processTelemetryData-in-0:
+        processNasaTelemetryData-in-0:
           group: ${spring.application.name}
-          destination: space-probe-aggregate-telemetry-data
+          destination: space-probe-aggregate-telemetry-data-nasa
+        processEsaTelemetryData-in-0:
+          group: ${spring.application.name}
+          destination: space-probe-aggregate-telemetry-data-esa
+    function:
+      # We define this explicitly since we have several consumer functions
+      definition: processNasaTelemetryData;processEsaTelemetryData

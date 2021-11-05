@@ -11,5 +11,7 @@ data class AggregatedTelemetryData(
     @JsonProperty("maxSpeedMph")
     val maxSpeedMph: Double,
     @JsonProperty("traveledDistanceFeet")
-    val traveledDistanceFeet: Double
+    val traveledDistanceFeet: Double,
+    @JsonProperty("spaceAgency")
+    val spaceAgency: SpaceAgency
 )

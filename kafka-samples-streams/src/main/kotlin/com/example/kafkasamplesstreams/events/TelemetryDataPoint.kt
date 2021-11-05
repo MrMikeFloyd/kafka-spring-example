@@ -11,5 +11,7 @@ data class TelemetryDataPoint(
     @JsonProperty("currentSpeedMph")
     val currentSpeedMph: Double,
     @JsonProperty("traveledDistanceFeet")
-    val traveledDistanceFeet: Double
+    val traveledDistanceFeet: Double,
+    @JsonProperty("spaceAgency")
+    val spaceAgency: SpaceAgency
 )
