@@ -27,6 +27,7 @@ class KafkaStreamsHandler {
                 Array<KStream<String, AggregatedTelemetryData>>> {
             it.transform({ TelemetryAggregationTransformer() }, STORE_NAME)
                 .branch(
+                    // Split up the processing pipeline depending on the space agency of the probe
                     Predicate { _, v -> v.spaceAgency == SpaceAgency.NASA },
                     Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA }
                 )
