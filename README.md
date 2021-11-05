@@ -1,6 +1,6 @@
-# Space Agency Kafka Spring Sample Project
+# Spring Boot & Kafka Streams Sample
 
-This sample project illustrates different ways to integrate Kafka with Spring. The following aspects are being considered:
+This sample project illustrates different ways to integrate Kafka with Spring, processing a Streams workload. The following aspects are being considered:
 
 - Producing messages to Kafka using `StreamBridge`
 - Handling Streams of Kafka messages using Spring Cloud Streams with the Functions and Kafka Streams API
@@ -19,7 +19,7 @@ We are helping a space agency to set up their telemetry data receivers. Therefor
   - NASA probes send their data in the imperial system (i.e. speed in miles/hour, distances in feet)
   - ESA probes send their data in the metric system (i.e. speed in kilometres/hour, distances in metres)
 
-The received data thus needs to converted into a common format (in our case, we opted for the metric system) to make sure that our mission experts can interpret the data correctly, regardless of how a given probe sent it. As we learned from [the Mars Climate Orbiter fail](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter), this is pretty important to keep our probes from ending up in a flaming fireball.
+The received data thus needs to be converted into a common format (in our case, we opted for the metric system) to make sure that our mission experts can interpret the data correctly, regardless of how a given probe sent it. As we learned from [the Mars Climate Orbiter fail](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter), this is pretty important to keep our probes from ending up in a flaming fireball.
 
 ## Technical setup
 
