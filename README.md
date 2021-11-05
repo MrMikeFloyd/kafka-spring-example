@@ -10,28 +10,30 @@ This sample project illustrates different ways to integrate Kafka with Spring. T
 
 To simulate a data processing pipeline, 3 separate services produce, process, and consume messages. The services' interactions can be observed using AKHQ and the application logs (see below for instructions on how to run it).
 
-## Fictitious use case
+## Fictitious use case :satellite:
 
-We are helping a european space agency to set up their telemetry data receivers. Therefore, we need to keep track of the telemetry data we receive from the various space probes that are roaming the solar system (and beyond!). The space agency's requirements are:
+We are helping a space agency to set up their telemetry data receivers. Therefore, we need to keep track of the telemetry data we receive from the various space probes that are roaming the solar system (and beyond!). The space agency's requirements are:
 
-- Receive the aggregated telemetry data per probe, i.e. the total distance traveled by a given probe and the maximum speed it has reached on its journey so far.
-- Receive the telemetry data in metric units.
+- We need frequent updates on the aggregated telemetry data per probe, i.e. the total distance traveled by a given probe and the maximum speed it has reached on its journey so far.
+- We need to be able to process aggregated telemetry data regardless of whether the inbound data was received from a NASA or an ESA probe:
+  - NASA probes send their data in the imperial system (i.e. speed in miles/hour, distances in feet)
+  - ESA probes send their data in the metric system (i.e. speed in kilometres/hour, distances in metres)
 
-All the space probes send their telemetry data using imperial units. As we learned from [the Mars Climate Orbiter fail](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter), we need to take care of this before the probe goes down in a flaming fireball.
+The received data thus needs to converted into a common format (in our case, we opted for the metric system) to make sure that our mission experts can interpret the data correctly, regardless of how a given probe sent it. As we learned from [the Mars Climate Orbiter fail](https://en.wikipedia.org/wiki/Mars_Climate_Orbiter), this is pretty important to keep our probes from ending up in a flaming fireball.
 
 ## Technical setup
 
 Our setup consists of 5 components:
 
-- Sample producer that simulates (imperial) telemetry data that comes in from the space probes
+- Sample producer that simulates imperial and metric telemetry data that comes in from a number of different space probes
 - Aggregator component that brings the data into the desired aggregated format
-- Sample consumer that ingests the (aggregated) imperial telemetry data and converts it into metric units
+- Sample consumer that ingests the (aggregated) imperial telemetry data and converts it into metric units if necessary
 - Kafka cluster for data transfer
 - AKHQ web UI for observing the Kafka cluster
 
 ## How to run
 
-To run this sample, you need Docker Desktop.
+In order to run this sample, you need Docker Desktop.
 You can run it by executing the following commands:
 
 - Start up the Kafka Cluster and AKHQ: `docker compose --project-directory ./docker up`
