@@ -20,4 +20,4 @@ spring:
           producer:
             # use kafka internal encoding
             useNativeEncoding: true
-          destination: nasa-space-probe-telemetry-data
+          destination: space-probe-telemetry-data

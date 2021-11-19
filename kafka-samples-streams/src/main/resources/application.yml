@@ -8,7 +8,7 @@ spring:
     stream:
       bindings:
         aggregateTelemetryData-in-0:
-          destination: nasa-space-probe-telemetry-data
+          destination: space-probe-telemetry-data
         aggregateTelemetryData-out-0:
           destination: space-probe-aggregate-telemetry-data-nasa
         aggregateTelemetryData-out-1:
