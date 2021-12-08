@@ -24,26 +24,31 @@ class KafkaStreamsHandler {
             Array<KStream<String, AggregatedTelemetryData>>> {
         return java.util.function.Function<
                 KStream<String, TelemetryDataPoint>,
-                Array<KStream<String, AggregatedTelemetryData>>> {
-            it
-                .groupByKey()
-                .aggregate(
-                    { AggregatedTelemetryData("INIT", 0.0, 0.0, SpaceAgency.NASA) },
-                    { probeId, lastTelemetryReading, currentAggregatedValue ->
-                        calculateAggregateProbeData(
-                            probeId,
-                            lastTelemetryReading,
-                            currentAggregatedValue
-                        )
-                    },
-                    Materialized.with(Serdes.StringSerde(), AggregateTelemetryDataSerde())
-                )
-                .toStream()
-                .branch(
-                    // Split up the processing pipeline depending on the space agency of the probe
-                    Predicate { _, v -> v.spaceAgency == SpaceAgency.NASA },
-                    Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA }
-                )
+                Array<KStream<String, AggregatedTelemetryData>>> { telemetryRecords ->
+            telemetryRecords.branch(
+                // Split up the processing pipeline into 2 streams, depending on the space agency of the probe
+                Predicate { _, v -> v.spaceAgency == SpaceAgency.NASA },
+                Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA }
+            ).map { telemetryRecordsPerAgency ->
+                // Apply aggregation logic on each stream separately
+                telemetryRecordsPerAgency
+                    .groupByKey()
+                    .aggregate(
+                        // KTable initializer
+                        { AggregatedTelemetryData(maxSpeedMph = 0.0, traveledDistanceFeet = 0.0) },
+                        // Calculation function for telemetry data aggregation
+                        { probeId, lastTelemetryReading, aggregatedTelemetryData ->
+                            updateTotals(
+                                probeId,
+                                lastTelemetryReading,
+                                aggregatedTelemetryData
+                            )
+                        },
+                        // Configure Serdes for State Store topic
+                        Materialized.with(Serdes.StringSerde(), AggregateTelemetryDataSerde())
+                    )
+                    .toStream()
+            }.toTypedArray()
         }
     }
 
@@ -53,7 +58,7 @@ class KafkaStreamsHandler {
      * backing the KTable created with aggregate() and the most recently
      * created aggregate telemetry data record is passed on downstream.
      */
-    fun calculateAggregateProbeData(
+    fun updateTotals(
         probeId: String,
         lastTelemetryReading: TelemetryDataPoint,
         currentAggregatedValue: AggregatedTelemetryData
@@ -63,14 +68,12 @@ class KafkaStreamsHandler {
         val maxSpeed = if (lastTelemetryReading.currentSpeedMph > currentAggregatedValue.maxSpeedMph)
             lastTelemetryReading.currentSpeedMph else currentAggregatedValue.maxSpeedMph
         val aggregatedTelemetryData = AggregatedTelemetryData(
-            probeId = lastTelemetryReading.probeId,
             traveledDistanceFeet = totalDistanceTraveled,
-            maxSpeedMph = maxSpeed,
-            spaceAgency = lastTelemetryReading.spaceAgency
+            maxSpeedMph = maxSpeed
         )
         logger.info {
             "Calculated new aggregated telemetry data for probe $probeId. New max speed: ${aggregatedTelemetryData.maxSpeedMph} and " +
-                    "travelled distance ${aggregatedTelemetryData.traveledDistanceFeet}"
+                    "traveled distance ${aggregatedTelemetryData.traveledDistanceFeet}"
 
         }
         return aggregatedTelemetryData
