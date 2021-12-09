@@ -23,7 +23,7 @@ class KafkaStreamsHandler {
     /**
      * Joins 2 Streams of data for the space probes using KTables.
      * After joining, the data is aggregated to calculate max/total values per probe
-     * and then passen on downstream for the consumer service
+     * and then passed on downstream for the consumer service
      */
     @Bean
     fun aggregateTelemetryData(): java.util.function.BiFunction<
@@ -31,9 +31,11 @@ class KafkaStreamsHandler {
             KStream<String, MeasurementDataPoint>,
             Array<KStream<String, AggregatedFullProbeMeasurementData>>> {
         return java.util.function.BiFunction<
+                // We have 2 inbound streams, telemetry data and measurement data per probe
                 KStream<String, TelemetryDataPoint>,
                 KStream<String, MeasurementDataPoint>,
                 Array<KStream<String, AggregatedFullProbeMeasurementData>>> { telemetryRecords, measurementRecords ->
+            // materialize both streams as KTables
             val telemetryDataTable = telemetryRecords.toTable(
                 Materialized
                     .`as`<String, TelemetryDataPoint, KeyValueStore<Bytes, ByteArray>>("telemetry-data")
@@ -46,6 +48,7 @@ class KafkaStreamsHandler {
                     .withKeySerde(Serdes.StringSerde())
                     .withValueSerde(MeasurementDataPointSerde())
             )
+            // Join both tables (default: By key), provide a ValueJoiner that merges both records into one
             telemetryDataTable.join(measurementDataTable) { telemetryRecord, measurementRecord ->
                 FullProbeMeasurement(
                     telemetryRecord.probeId,
@@ -54,9 +57,9 @@ class KafkaStreamsHandler {
                     telemetryRecord.traveledDistanceFeet,
                     telemetryRecord.spaceAgency
                 )
-            }.toStream()
+            }.toStream() // convert the resulting KTable into a KStream
                 .branch(
-                    // Split up the processing pipeline into 2 streams, depending on the space agency of the probe
+                    // Split up the stream into 2 streams, depending on the space agency of the probe
                     Predicate { _, v -> v.spaceAgency == SpaceAgency.NASA },
                     Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA }
                 ).map { telemetryRecordsPerAgency ->
@@ -64,7 +67,7 @@ class KafkaStreamsHandler {
                     telemetryRecordsPerAgency
                         .groupByKey()
                         .aggregate(
-                            // KTable initializer
+                            // initialize another KTable for performing the aggregation
                             { AggregatedFullProbeMeasurementData(maxSpeedMph = 0.0, traveledDistanceFeet = 0.0, highestRadiation = 0.0) },
                             // Calculation function for telemetry data aggregation
                             { probeId, lastTelemetryReading, aggregatedTelemetryData ->
