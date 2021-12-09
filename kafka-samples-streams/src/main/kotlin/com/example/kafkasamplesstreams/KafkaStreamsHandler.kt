@@ -36,7 +36,7 @@ class KafkaStreamsHandler {
                 Array<KStream<String, AggregatedFullProbeMeasurementData>>> { telemetryRecords, measurementRecords ->
             val telemetryDataTable = telemetryRecords.toTable(
                 Materialized
-                    .`as`<String?, TelemetryDataPoint?, KeyValueStore<Bytes, ByteArray>?>("telemetry-data")
+                    .`as`<String, TelemetryDataPoint, KeyValueStore<Bytes, ByteArray>>("telemetry-data")
                     .withKeySerde(Serdes.StringSerde())
                     .withValueSerde(TelemetryDataPointSerde())
             )
