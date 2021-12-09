@@ -31,6 +31,7 @@ dependencies {
     implementation("io.confluent:kafka-streams-avro-serde:6.2.0")
     implementation("io.github.microutils:kotlin-logging:2.0.11")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.apache.kafka:kafka-streams-test-utils")
 }
 
 dependencyManagement {

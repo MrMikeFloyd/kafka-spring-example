@@ -9,6 +9,8 @@ spring:
       bindings:
         aggregateTelemetryData-in-0:
           destination: space-probe-telemetry-data
+        aggregateTelemetryData-in-1:
+          destination: space-probe-measurement-data
         aggregateTelemetryData-out-0:
           destination: space-probe-aggregate-telemetry-data-nasa
         aggregateTelemetryData-out-1:
@@ -22,12 +24,16 @@ spring:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.TelemetryDataPointSerde
               deserializationExceptionHandler: logAndContinue
+            aggregateTelemetryData-in-1.consumer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.MeasurementDataPointSerde
+              deserializationExceptionHandler: logAndContinue
             aggregateTelemetryData-out-0.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-              valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.AggregatedFullProbeDataSerde
             aggregateTelemetryData-out-1.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
-              valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.AggregatedFullProbeDataSerde
 management:
   endpoints:
     web:

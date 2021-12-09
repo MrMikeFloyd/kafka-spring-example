@@ -6,4 +6,7 @@ data class ImperialTelemetryData(
     @JsonProperty("traveledDistanceFeet")
     val totalDistanceTraveledFeet: Double,
     @JsonProperty("maxSpeedMph")
-    val maxSpeedMph: Double)
+    val maxSpeedMph: Double,
+    @JsonProperty("highestRadiation")
+    val maximumRadiation: Double
+)

@@ -3,7 +3,6 @@ package de.codecentric.samples.kafkasamplesconsumer
 import de.codecentric.samples.kafkasamplesconsumer.event.ImperialTelemetryData
 import de.codecentric.samples.kafkasamplesconsumer.event.MetricTelemetryData
 import mu.KotlinLogging
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.messaging.Message
@@ -22,7 +21,8 @@ class KafkaConsumerConfiguration {
                 logger.info {
                     "\nReceived telemetry data for NASA probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}':" +
                             "\n\tMax Speed: ${imperialTelemetryData.maxSpeedMph} mph" +
-                            "\n\tTotal distance travelled: ${imperialTelemetryData.totalDistanceTraveledFeet} feet"
+                            "\n\tTotal distance travelled: ${imperialTelemetryData.totalDistanceTraveledFeet} feet" +
+                            "\n\tMaximum radiation detected: ${imperialTelemetryData.maximumRadiation} mSv"
                 }
             } catch (e: Exception) {
                 logger.error {
@@ -40,7 +40,8 @@ class KafkaConsumerConfiguration {
                 logger.info {
                     "\nReceived telemetry data for ESA probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}':" +
                             "\n\tMax Speed: ${metricTelemetryData.maxSpeedKph} kph" +
-                            "\n\tTotal distance travelled: ${metricTelemetryData.totalDistanceMetres} meters"
+                            "\n\tTotal distance travelled: ${metricTelemetryData.totalDistanceMetres} meters" +
+                            "\n\tMaximum radiation detected: ${metricTelemetryData.maximumRadiation} mSv"
                 }
             } catch (e: Exception) {
                 logger.error {

@@ -15,9 +15,20 @@ spring:
                 # Otherwise de.codecentric.samples.kafkasamplesproducer.event.TelemetryData will be added as a header info
                 # which can't be deserialized by consumers (unless they have kafka.properties.spring.json.use.type.headers: false themselves)
                 spring.json.add.type.headers: false
+          measurement-data-out-0:
+            producer:
+              configuration:
+                key.serializer: org.springframework.kafka.support.serializer.ToStringSerializer
+                value.serializer: org.springframework.kafka.support.serializer.JsonSerializer
+                spring.json.add.type.headers: false
       bindings:
         telemetry-data-out-0:
           producer:
             # use kafka internal encoding
             useNativeEncoding: true
           destination: space-probe-telemetry-data
+        measurement-data-out-0:
+          producer:
+            # use kafka internal encoding
+            useNativeEncoding: true
+          destination: space-probe-measurement-data
