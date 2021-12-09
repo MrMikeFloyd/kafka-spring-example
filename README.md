@@ -49,4 +49,8 @@ The sample producer will emit a sample telemetry record for one of 10 different 
 
 If you want to have a look at the Streams Topology used in this sample, you find a visualization in the `doc` subdirectory. Generate your own [via Spring Boot Actuator](http://localhost:8080/actuator/kafkastreamstopology/kafka-telemetry-data-aggregator) and the excellent [Kafka Streams Topology Visualizer](https://zz85.github.io/kafka-streams-viz/).
 
+### My docker containers are throwing errors on startup - what's wrong?
+
+Unless you're running this example for the first time, your docker containers might be struggling with a previous inconsistent state. Giving yourself a fresh start by running `docker-compose down --remove-orphans -v` inside the `docker` directory should do the trick.
+
 Have fun!
