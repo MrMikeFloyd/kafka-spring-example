@@ -51,11 +51,11 @@ class KafkaStreamsHandler {
             // Join both tables (default: By key), provide a ValueJoiner that merges both records into one
             telemetryDataTable.join(measurementDataTable) { telemetryRecord, measurementRecord ->
                 FullProbeMeasurement(
-                    telemetryRecord.probeId,
+                    probeId = telemetryRecord.probeId,
                     radiation = measurementRecord.radiation,
                     currentSpeedMph = telemetryRecord.currentSpeedMph,
-                    telemetryRecord.traveledDistanceFeet,
-                    telemetryRecord.spaceAgency
+                    traveledDistanceFeet = telemetryRecord.traveledDistanceFeet,
+                    spaceAgency = telemetryRecord.spaceAgency
                 )
             }.toStream() // convert the resulting KTable into a KStream
                 .branch(
