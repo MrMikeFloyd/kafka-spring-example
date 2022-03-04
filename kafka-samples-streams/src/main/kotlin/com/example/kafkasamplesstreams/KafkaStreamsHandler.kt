@@ -1,18 +1,18 @@
 package com.example.kafkasamplesstreams
 
-import com.example.kafkasamplesstreams.events.AggregatedTelemetryData
-import com.example.kafkasamplesstreams.events.SpaceAgency
-import com.example.kafkasamplesstreams.events.TelemetryDataPoint
+import com.example.kafkasamplesstreams.events.*
 import com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
 import mu.KotlinLogging
 import org.apache.kafka.common.serialization.Serdes
 import org.apache.kafka.streams.kstream.KStream
 import org.apache.kafka.streams.kstream.Materialized
 import org.apache.kafka.streams.kstream.Predicate
+import org.apache.kafka.streams.kstream.ValueJoiner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 
+@Suppress("NAME_SHADOWING")
 @Configuration
 class KafkaStreamsHandler {
 
@@ -52,6 +52,28 @@ class KafkaStreamsHandler {
         }
     }
 
+    @Bean
+    fun telemetryDisabledJoiner(): java.util.function.BiFunction<
+            KStream<String, TelemetryDataPoint>,
+            KStream<String, Disabled>,
+            KStream<String, TelemetryDataPointWithDisabled>> {
+        return java.util.function.BiFunction<
+                KStream<String, TelemetryDataPoint>,
+                KStream<String, Disabled>,
+                KStream<String, TelemetryDataPointWithDisabled>> { telemetryRecords, disabled ->
+            val telemetryRecordsTable = telemetryRecords.toTable()
+            val disabledTable = disabled.toTable()
+
+            telemetryRecordsTable.leftJoin(disabledTable
+            ) { telemetryData: TelemetryDataPoint, disabled: Disabled? ->
+                val telemetryDataPointWithDisabled = TelemetryDataPointWithDisabled(telemetryData, disabled)
+                logger.info { "Calculated new TelemetryDataPointWithDisabled: ${telemetryDataPointWithDisabled.probeId} with disabled: ${telemetryDataPointWithDisabled.disabled}" }
+                telemetryDataPointWithDisabled
+            }
+                .toStream()
+        }
+    }
+
     /**
      * Performs calculation of per-probe aggregate measurement data.
      * The currently calculated totals are held in a Kafka State Store
@@ -61,7 +83,7 @@ class KafkaStreamsHandler {
     fun updateTotals(
         probeId: String,
         lastTelemetryReading: TelemetryDataPoint,
-        currentAggregatedValue: AggregatedTelemetryData
+        currentAggregatedValue: AggregatedTelemetryData,
     ): AggregatedTelemetryData {
         val totalDistanceTraveled =
             lastTelemetryReading.traveledDistanceFeet + currentAggregatedValue.traveledDistanceFeet

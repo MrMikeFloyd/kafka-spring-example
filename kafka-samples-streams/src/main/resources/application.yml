@@ -4,15 +4,21 @@ spring:
     name: kafka-telemetry-data-aggregator
   cloud:
     function:
-      definition: aggregateTelemetryData
+      definition: aggregateTelemetryData;telemetryDisabledJoiner
     stream:
       bindings:
         aggregateTelemetryData-in-0:
           destination: space-probe-telemetry-data
+        telemetryDisabledJoiner-in-0:
+          destination: space-probe-telemetry-data
+        telemetryDisabledJoiner-in-1:
+          destination: disabled
         aggregateTelemetryData-out-0:
           destination: space-probe-aggregate-telemetry-data-nasa
         aggregateTelemetryData-out-1:
           destination: space-probe-aggregate-telemetry-data-esa
+        telemetryDisabledJoiner-out-0:
+          destination: space-probe-telemetry-data-with-disabled
       kafka:
         binder:
           brokers: "localhost:29092"
@@ -22,12 +28,24 @@ spring:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.TelemetryDataPointSerde
               deserializationExceptionHandler: logAndContinue
+              applicationId: aggregator-stream
+            telemetryDisabledJoiner-in-0.consumer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.TelemetryDataPointSerde
+              deserializationExceptionHandler: logAndContinue
+            telemetryDisabledJoiner-in-1.consumer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.DisabledSerde
+              deserializationExceptionHandler: logAndContinue
             aggregateTelemetryData-out-0.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
             aggregateTelemetryData-out-1.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+            telemetryDisabledJoiner-out-0.producer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.TelemetryDataWithDisabledSerde
 management:
   endpoints:
     web:

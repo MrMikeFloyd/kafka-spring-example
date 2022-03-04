@@ -1,5 +1,6 @@
 package de.codecentric.samples.kafkasamplesproducer
 
+import de.codecentric.samples.kafkasamplesproducer.event.Disabled
 import de.codecentric.samples.kafkasamplesproducer.event.TelemetryData
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,5 +22,15 @@ class TelemetryDataStreamBridge(@Autowired val streamBridge: StreamBridge) {
             .build()
         logger.info { "Publishing space probe telemetry data: Payload: '${kafkaMessage.payload}'" }
         streamBridge.send("telemetry-data-out-0", kafkaMessage)
+    }
+
+    fun sendDisabled(disabled: Disabled) {
+        val kafkaMessage = MessageBuilder
+            .withPayload(disabled)
+            // Make sure all messages for a given probe go to the same partition to ensure proper ordering
+            .setHeader(KafkaHeaders.MESSAGE_KEY, disabled.probeId)
+            .build()
+        logger.info { "Publishing disabled: Payload: '${kafkaMessage.payload}'" }
+        streamBridge.send("disabled-out-0", kafkaMessage)
     }
 }

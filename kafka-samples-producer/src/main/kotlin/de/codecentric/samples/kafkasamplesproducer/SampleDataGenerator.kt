@@ -1,5 +1,6 @@
 package de.codecentric.samples.kafkasamplesproducer
 
+import de.codecentric.samples.kafkasamplesproducer.event.Disabled
 import de.codecentric.samples.kafkasamplesproducer.event.SpaceAgency
 import de.codecentric.samples.kafkasamplesproducer.event.TelemetryData
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,5 +29,16 @@ class SampleDataGenerator(@Autowired val telemetryDataStreamBridge: TelemetryDat
             }
         )
         telemetryDataStreamBridge.send(telemetryData)
+    }
+
+    // Emit 1 disabled data point every 3s, wait 5s for the application to settle
+    @Scheduled(initialDelay = 5000L, fixedRate = 3000L)
+    fun emitDisabled() {
+        val nextInt = Random.nextInt(10)
+        val disabled = Disabled(
+            probeId = nextInt.toString(),
+            Math.random() < 0.5
+        )
+        telemetryDataStreamBridge.sendDisabled(disabled)
     }
 }
