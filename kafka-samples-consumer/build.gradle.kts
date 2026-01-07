@@ -28,6 +28,7 @@ dependencies {
 	testImplementation("io.mockk:mockk:1.12.0")
 	testImplementation("com.ninja-squad:springmockk:3.0.1")
 	testImplementation("org.springframework.kafka:spring-kafka-test")
+	testImplementation("org.awaitility:awaitility:4.1.0")
 }
 
 dependencyManagement {
