@@ -25,6 +25,9 @@ dependencies {
 	implementation("org.springframework.kafka:spring-kafka")
 	implementation("io.github.microutils:kotlin-logging:2.0.11")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("io.mockk:mockk:1.12.0")
+	testImplementation("com.ninja-squad:springmockk:3.0.1")
+	testImplementation("org.springframework.kafka:spring-kafka-test")
 }
 
 dependencyManagement {

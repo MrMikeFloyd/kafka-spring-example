@@ -30,7 +30,11 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-stream-binder-kafka")
     implementation("io.confluent:kafka-streams-avro-serde:6.2.0")
     implementation("io.github.microutils:kotlin-logging:2.0.11")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk:1.12.0")
+    testImplementation("com.ninja-squad:springmockk:3.0.1")
+    testImplementation("org.apache.kafka:kafka-streams-test-utils:2.7.1")
 }
 
 dependencyManagement {
