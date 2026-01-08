@@ -24,7 +24,7 @@ class AggregateTelemetryDataSerdeTest {
         val bytes = serde.serializer().serialize("test-topic", aggregatedData)
 
         assertNotNull(bytes)
-        assertTrue(bytes.isNotEmpty())
+        assertTrue(bytes!!.isNotEmpty())
     }
 
     @Test

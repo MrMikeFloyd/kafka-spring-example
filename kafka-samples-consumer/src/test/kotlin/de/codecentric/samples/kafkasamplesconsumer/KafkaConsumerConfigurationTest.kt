@@ -40,7 +40,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "nasa-probe-1")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "nasa-probe-1")
             .build()
 
         assertDoesNotThrow {
@@ -56,7 +56,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "esa-probe-1")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "esa-probe-1")
             .build()
 
         assertDoesNotThrow {
@@ -72,7 +72,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "nasa-probe-0")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "nasa-probe-0")
             .build()
 
         assertDoesNotThrow {
@@ -88,7 +88,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "esa-probe-0")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "esa-probe-0")
             .build()
 
         assertDoesNotThrow {
@@ -104,7 +104,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "nasa-probe-large")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "nasa-probe-large")
             .build()
 
         assertDoesNotThrow {
@@ -120,7 +120,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "esa-probe-large")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "esa-probe-large")
             .build()
 
         assertDoesNotThrow {
@@ -166,7 +166,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "nasa-probe-decimal")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "nasa-probe-decimal")
             .build()
 
         assertDoesNotThrow {
@@ -182,7 +182,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "esa-probe-decimal")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "esa-probe-decimal")
             .build()
 
         assertDoesNotThrow {
@@ -228,7 +228,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "nasa-orbital")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "nasa-orbital")
             .build()
 
         assertDoesNotThrow {
@@ -244,7 +244,7 @@ class KafkaConsumerConfigurationTest {
         )
         val message = MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, "esa-orbital")
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "esa-orbital")
             .build()
 
         assertDoesNotThrow {
@@ -299,7 +299,7 @@ class KafkaConsumerConfigurationTest {
         )
         return MessageBuilder
             .withPayload(telemetryData)
-            .setHeader(KafkaHeaders.RECEIVED_MESSAGE_KEY, probeId)
+            .setHeader(KafkaHeaders.RECEIVED_KEY, probeId)
             .build()
     }
 }

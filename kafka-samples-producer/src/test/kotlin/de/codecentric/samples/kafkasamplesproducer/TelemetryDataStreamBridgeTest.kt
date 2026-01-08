@@ -75,7 +75,7 @@ class TelemetryDataStreamBridgeTest {
         telemetryDataStreamBridge.send(telemetryData)
 
         val capturedMessage = messageSlot.captured
-        assertEquals("probe-3", capturedMessage.headers[KafkaHeaders.MESSAGE_KEY])
+        assertEquals("probe-3", capturedMessage.headers[KafkaHeaders.KEY])
     }
 
     @Test
@@ -120,8 +120,8 @@ class TelemetryDataStreamBridgeTest {
             streamBridge.send("telemetry-data-out-0", any<Message<*>>())
         }
         assertEquals(2, messageSlots.size)
-        assertEquals("probe-A", messageSlots[0].headers[KafkaHeaders.MESSAGE_KEY])
-        assertEquals("probe-B", messageSlots[1].headers[KafkaHeaders.MESSAGE_KEY])
+        assertEquals("probe-A", messageSlots[0].headers[KafkaHeaders.KEY])
+        assertEquals("probe-B", messageSlots[1].headers[KafkaHeaders.KEY])
     }
 
     @Test
@@ -146,8 +146,8 @@ class TelemetryDataStreamBridgeTest {
         telemetryDataStreamBridge.send(telemetryData2)
 
         assertEquals(2, messageSlots.size)
-        assertEquals("probe-1", messageSlots[0].headers[KafkaHeaders.MESSAGE_KEY])
-        assertEquals("probe-1", messageSlots[1].headers[KafkaHeaders.MESSAGE_KEY])
+        assertEquals("probe-1", messageSlots[0].headers[KafkaHeaders.KEY])
+        assertEquals("probe-1", messageSlots[1].headers[KafkaHeaders.KEY])
     }
 
     @Test

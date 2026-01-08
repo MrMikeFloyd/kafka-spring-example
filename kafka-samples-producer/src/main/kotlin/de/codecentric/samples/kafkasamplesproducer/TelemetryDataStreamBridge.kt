@@ -17,7 +17,7 @@ class TelemetryDataStreamBridge(@Autowired val streamBridge: StreamBridge) {
         val kafkaMessage = MessageBuilder
             .withPayload(telemetryData)
             // Make sure all messages for a given probe go to the same partition to ensure proper ordering
-            .setHeader(KafkaHeaders.MESSAGE_KEY, telemetryData.probeId)
+            .setHeader(KafkaHeaders.KEY, telemetryData.probeId)
             .build()
         logger.info { "Publishing space probe telemetry data: Payload: '${kafkaMessage.payload}'" }
         streamBridge.send("telemetry-data-out-0", kafkaMessage)
