@@ -4,7 +4,7 @@ spring:
     name: kafka-telemetry-data-aggregator
   cloud:
     function:
-      definition: aggregateTelemetryData
+      definition: aggregateTelemetryData;consumeNasaAggregates;consumeEsaAggregates
     stream:
       bindings:
         aggregateTelemetryData-in-0:
@@ -13,6 +13,12 @@ spring:
           destination: space-probe-aggregate-telemetry-data-nasa
         aggregateTelemetryData-out-1:
           destination: space-probe-aggregate-telemetry-data-esa
+        consumeNasaAggregates-in-0:
+          destination: space-probe-aggregate-telemetry-data-nasa
+          group: web-dashboard
+        consumeEsaAggregates-in-0:
+          destination: space-probe-aggregate-telemetry-data-esa
+          group: web-dashboard
       kafka:
         binder:
           brokers: "localhost:29092"
@@ -26,6 +32,12 @@ spring:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
             aggregateTelemetryData-out-1.producer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+            consumeNasaAggregates-in-0.consumer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+            consumeEsaAggregates-in-0.consumer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
 management:
