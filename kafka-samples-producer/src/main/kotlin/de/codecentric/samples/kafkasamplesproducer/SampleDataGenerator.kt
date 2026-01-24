@@ -19,12 +19,9 @@ class SampleDataGenerator(@Autowired val telemetryDataStreamBridge: TelemetryDat
             currentSpeedMph = Random.nextDouble(0.0, 1000.0),
             traveledDistanceFeet = Random.nextDouble(1.0, 10000.0),
             spaceAgency = when {
-                nextInt < 5 -> {
-                    SpaceAgency.NASA
-                }
-                else -> {
-                    SpaceAgency.ESA
-                }
+                nextInt < 4 -> SpaceAgency.NASA
+                nextInt < 7 -> SpaceAgency.ESA
+                else -> SpaceAgency.ROSCOSMOS
             }
         )
         telemetryDataStreamBridge.send(telemetryData)

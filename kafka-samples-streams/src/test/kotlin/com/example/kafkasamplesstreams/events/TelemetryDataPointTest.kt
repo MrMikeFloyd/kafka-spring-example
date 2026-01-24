@@ -48,6 +48,18 @@ class TelemetryDataPointTest {
     }
 
     @Test
+    fun `should support ROSCOSMOS space agency`() {
+        val dataPoint = TelemetryDataPoint(
+            probeId = "roscosmos-probe",
+            currentSpeedMph = 650.0,
+            traveledDistanceFeet = 6500.0,
+            spaceAgency = SpaceAgency.ROSCOSMOS
+        )
+
+        assertEquals(SpaceAgency.ROSCOSMOS, dataPoint.spaceAgency)
+    }
+
+    @Test
     fun `should support zero values`() {
         val dataPoint = TelemetryDataPoint(
             probeId = "probe-0",
@@ -160,6 +172,39 @@ class TelemetryDataPointTest {
         assertTrue(json.contains("\"currentSpeedMph\":800.0"))
         assertTrue(json.contains("\"traveledDistanceFeet\":8000.0"))
         assertTrue(json.contains("\"spaceAgency\":\"ESA\""))
+    }
+
+    @Test
+    fun `should deserialize ROSCOSMOS from JSON`() {
+        val json = """
+            {
+                "probeId": "roscosmos-test",
+                "currentSpeedMph": 700.0,
+                "traveledDistanceFeet": 7000.0,
+                "spaceAgency": "ROSCOSMOS"
+            }
+        """.trimIndent()
+
+        val dataPoint = objectMapper.readValue(json, TelemetryDataPoint::class.java)
+
+        assertEquals("roscosmos-test", dataPoint.probeId)
+        assertEquals(700.0, dataPoint.currentSpeedMph)
+        assertEquals(7000.0, dataPoint.traveledDistanceFeet)
+        assertEquals(SpaceAgency.ROSCOSMOS, dataPoint.spaceAgency)
+    }
+
+    @Test
+    fun `should serialize ROSCOSMOS to JSON`() {
+        val dataPoint = TelemetryDataPoint(
+            probeId = "probe-roscosmos",
+            currentSpeedMph = 850.0,
+            traveledDistanceFeet = 8500.0,
+            spaceAgency = SpaceAgency.ROSCOSMOS
+        )
+
+        val json = objectMapper.writeValueAsString(dataPoint)
+
+        assertTrue(json.contains("\"spaceAgency\":\"ROSCOSMOS\""))
     }
 
     @Test

@@ -2,6 +2,7 @@ package de.codecentric.samples.kafkasamplesconsumer
 
 import de.codecentric.samples.kafkasamplesconsumer.event.ImperialTelemetryData
 import de.codecentric.samples.kafkasamplesconsumer.event.MetricTelemetryData
+import de.codecentric.samples.kafkasamplesconsumer.event.VerstaTelemetryData
 import mu.KotlinLogging
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.annotation.Bean
@@ -45,6 +46,24 @@ class KafkaConsumerConfiguration {
             } catch (e: Exception) {
                 logger.error {
                     "Error processing telemetry data for ESA probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}': " +
+                            "'${telemetryMessage.payload}': '${e.message}'"
+                }
+            }
+        }
+
+    @Bean
+    fun processRoscosmosTelemetryData(): Consumer<Message<ImperialTelemetryData>> =
+        Consumer { telemetryMessage ->
+            try {
+                val verstaTelemetryData = VerstaTelemetryData(telemetryMessage.payload)
+                logger.info {
+                    "\nReceived telemetry data for ROSCOSMOS probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}':" +
+                            "\n\tMax Speed: ${verstaTelemetryData.maxSpeedVerstasPerHour} verstas/hour" +
+                            "\n\tTotal distance travelled: ${verstaTelemetryData.totalDistanceVerstas} verstas"
+                }
+            } catch (e: Exception) {
+                logger.error {
+                    "Error processing telemetry data for ROSCOSMOS probe '${telemetryMessage.headers["kafka_receivedMessageKey"]}': " +
                             "'${telemetryMessage.payload}': '${e.message}'"
                 }
             }

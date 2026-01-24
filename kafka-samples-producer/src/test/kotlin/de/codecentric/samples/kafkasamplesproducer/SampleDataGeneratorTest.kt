@@ -71,11 +71,11 @@ class SampleDataGeneratorTest {
     }
 
     @Test
-    fun `should assign NASA to probe IDs less than 5`() {
+    fun `should assign NASA to probe IDs 0-3`() {
         val telemetryDataSlots = mutableListOf<TelemetryData>()
 
         // Run multiple times to capture different random values
-        repeat(50) {
+        repeat(100) {
             sampleDataGenerator.emitSampleTelemetryData()
         }
 
@@ -83,21 +83,21 @@ class SampleDataGeneratorTest {
             telemetryDataStreamBridge.send(capture(telemetryDataSlots))
         }
 
-        // Check that probe IDs < 5 are assigned to NASA
-        val nasaProbes = telemetryDataSlots.filter { it.probeId.toInt() < 5 }
+        // Check that probe IDs < 4 are assigned to NASA
+        val nasaProbes = telemetryDataSlots.filter { it.probeId.toInt() < 4 }
         assertTrue(nasaProbes.isNotEmpty(), "Should have at least one NASA probe")
         assertTrue(
             nasaProbes.all { it.spaceAgency == SpaceAgency.NASA },
-            "All probes with ID < 5 should belong to NASA"
+            "All probes with ID < 4 should belong to NASA"
         )
     }
 
     @Test
-    fun `should assign ESA to probe IDs 5 or greater`() {
+    fun `should assign ESA to probe IDs 4-6`() {
         val telemetryDataSlots = mutableListOf<TelemetryData>()
 
         // Run multiple times to capture different random values
-        repeat(50) {
+        repeat(100) {
             sampleDataGenerator.emitSampleTelemetryData()
         }
 
@@ -105,12 +105,34 @@ class SampleDataGeneratorTest {
             telemetryDataStreamBridge.send(capture(telemetryDataSlots))
         }
 
-        // Check that probe IDs >= 5 are assigned to ESA
-        val esaProbes = telemetryDataSlots.filter { it.probeId.toInt() >= 5 }
+        // Check that probe IDs 4-6 are assigned to ESA
+        val esaProbes = telemetryDataSlots.filter { it.probeId.toInt() in 4..6 }
         assertTrue(esaProbes.isNotEmpty(), "Should have at least one ESA probe")
         assertTrue(
             esaProbes.all { it.spaceAgency == SpaceAgency.ESA },
-            "All probes with ID >= 5 should belong to ESA"
+            "All probes with ID 4-6 should belong to ESA"
+        )
+    }
+
+    @Test
+    fun `should assign ROSCOSMOS to probe IDs 7-9`() {
+        val telemetryDataSlots = mutableListOf<TelemetryData>()
+
+        // Run multiple times to capture different random values
+        repeat(100) {
+            sampleDataGenerator.emitSampleTelemetryData()
+        }
+
+        verify(atLeast = 1) {
+            telemetryDataStreamBridge.send(capture(telemetryDataSlots))
+        }
+
+        // Check that probe IDs >= 7 are assigned to ROSCOSMOS
+        val roscosmosProbes = telemetryDataSlots.filter { it.probeId.toInt() >= 7 }
+        assertTrue(roscosmosProbes.isNotEmpty(), "Should have at least one ROSCOSMOS probe")
+        assertTrue(
+            roscosmosProbes.all { it.spaceAgency == SpaceAgency.ROSCOSMOS },
+            "All probes with ID >= 7 should belong to ROSCOSMOS"
         )
     }
 
@@ -163,7 +185,7 @@ class SampleDataGeneratorTest {
         assertNotNull(capturedData.timestamp)
         assertTrue(capturedData.currentSpeedMph >= 0.0 && capturedData.currentSpeedMph < 1000.0)
         assertTrue(capturedData.traveledDistanceFeet >= 1.0 && capturedData.traveledDistanceFeet < 10000.0)
-        assertTrue(capturedData.spaceAgency in listOf(SpaceAgency.NASA, SpaceAgency.ESA))
+        assertTrue(capturedData.spaceAgency in listOf(SpaceAgency.NASA, SpaceAgency.ESA, SpaceAgency.ROSCOSMOS))
     }
 
     @Test
@@ -181,17 +203,21 @@ class SampleDataGeneratorTest {
         // Verify the assignment logic is correct for all generated data
         telemetryDataSlots.forEach { data ->
             val probeId = data.probeId.toInt()
-            if (probeId < 5) {
-                assertEquals(
+            when {
+                probeId < 4 -> assertEquals(
                     SpaceAgency.NASA,
                     data.spaceAgency,
                     "Probe $probeId should be assigned to NASA"
                 )
-            } else {
-                assertEquals(
+                probeId < 7 -> assertEquals(
                     SpaceAgency.ESA,
                     data.spaceAgency,
                     "Probe $probeId should be assigned to ESA"
+                )
+                else -> assertEquals(
+                    SpaceAgency.ROSCOSMOS,
+                    data.spaceAgency,
+                    "Probe $probeId should be assigned to ROSCOSMOS"
                 )
             }
         }

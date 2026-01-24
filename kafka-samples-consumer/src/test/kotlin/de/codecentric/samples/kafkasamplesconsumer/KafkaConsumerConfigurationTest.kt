@@ -14,12 +14,14 @@ class KafkaConsumerConfigurationTest {
     private lateinit var configuration: KafkaConsumerConfiguration
     private lateinit var nasaConsumer: Consumer<Message<ImperialTelemetryData>>
     private lateinit var esaConsumer: Consumer<Message<ImperialTelemetryData>>
+    private lateinit var roscosmosConsumer: Consumer<Message<ImperialTelemetryData>>
 
     @BeforeEach
     fun setup() {
         configuration = KafkaConsumerConfiguration()
         nasaConsumer = configuration.processNasaTelemetryData()
         esaConsumer = configuration.processEsaTelemetryData()
+        roscosmosConsumer = configuration.processRoscosmosTelemetryData()
     }
 
     @Test
@@ -30,6 +32,11 @@ class KafkaConsumerConfigurationTest {
     @Test
     fun `should create ESA telemetry consumer bean`() {
         assertNotNull(esaConsumer)
+    }
+
+    @Test
+    fun `should create ROSCOSMOS telemetry consumer bean`() {
+        assertNotNull(roscosmosConsumer)
     }
 
     @Test
@@ -61,6 +68,22 @@ class KafkaConsumerConfigurationTest {
 
         assertDoesNotThrow {
             esaConsumer.accept(message)
+        }
+    }
+
+    @Test
+    fun `should process ROSCOSMOS telemetry data message`() {
+        val telemetryData = ImperialTelemetryData(
+            totalDistanceTraveledFeet = 7000.0,
+            maxSpeedMph = 700.0
+        )
+        val message = MessageBuilder
+            .withPayload(telemetryData)
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "roscosmos-probe-1")
+            .build()
+
+        assertDoesNotThrow {
+            roscosmosConsumer.accept(message)
         }
     }
 
@@ -97,6 +120,22 @@ class KafkaConsumerConfigurationTest {
     }
 
     @Test
+    fun `should process ROSCOSMOS message with zero values`() {
+        val telemetryData = ImperialTelemetryData(
+            totalDistanceTraveledFeet = 0.0,
+            maxSpeedMph = 0.0
+        )
+        val message = MessageBuilder
+            .withPayload(telemetryData)
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "roscosmos-probe-0")
+            .build()
+
+        assertDoesNotThrow {
+            roscosmosConsumer.accept(message)
+        }
+    }
+
+    @Test
     fun `should process NASA message with large values`() {
         val telemetryData = ImperialTelemetryData(
             totalDistanceTraveledFeet = 1000000.0,
@@ -129,6 +168,22 @@ class KafkaConsumerConfigurationTest {
     }
 
     @Test
+    fun `should process ROSCOSMOS message with large values`() {
+        val telemetryData = ImperialTelemetryData(
+            totalDistanceTraveledFeet = 3500000.0,
+            maxSpeedMph = 35000.0
+        )
+        val message = MessageBuilder
+            .withPayload(telemetryData)
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "roscosmos-probe-large")
+            .build()
+
+        assertDoesNotThrow {
+            roscosmosConsumer.accept(message)
+        }
+    }
+
+    @Test
     fun `should process multiple NASA messages sequentially`() {
         val messages = listOf(
             createTestMessage("probe-1", 1000.0, 100.0),
@@ -154,6 +209,21 @@ class KafkaConsumerConfigurationTest {
         messages.forEach { message ->
             assertDoesNotThrow {
                 esaConsumer.accept(message)
+            }
+        }
+    }
+
+    @Test
+    fun `should process multiple ROSCOSMOS messages sequentially`() {
+        val messages = listOf(
+            createTestMessage("probe-7", 7000.0, 700.0),
+            createTestMessage("probe-8", 8000.0, 800.0),
+            createTestMessage("probe-9", 9000.0, 900.0)
+        )
+
+        messages.forEach { message ->
+            assertDoesNotThrow {
+                roscosmosConsumer.accept(message)
             }
         }
     }
@@ -221,6 +291,21 @@ class KafkaConsumerConfigurationTest {
     }
 
     @Test
+    fun `should handle ROSCOSMOS message without message key header`() {
+        val telemetryData = ImperialTelemetryData(
+            totalDistanceTraveledFeet = 7000.0,
+            maxSpeedMph = 700.0
+        )
+        val message = MessageBuilder
+            .withPayload(telemetryData)
+            .build()
+
+        assertDoesNotThrow {
+            roscosmosConsumer.accept(message)
+        }
+    }
+
+    @Test
     fun `should process NASA message with realistic orbital speed`() {
         val telemetryData = ImperialTelemetryData(
             totalDistanceTraveledFeet = 26400000.0, // 5000 miles
@@ -266,12 +351,24 @@ class KafkaConsumerConfigurationTest {
 
     @Test
     fun `should handle different probe IDs for ESA`() {
-        val probeIds = listOf("5", "6", "7", "8", "9")
+        val probeIds = listOf("4", "5", "6")
 
         probeIds.forEach { probeId ->
             val message = createTestMessage(probeId, 2000.0, 200.0)
             assertDoesNotThrow {
                 esaConsumer.accept(message)
+            }
+        }
+    }
+
+    @Test
+    fun `should handle different probe IDs for ROSCOSMOS`() {
+        val probeIds = listOf("7", "8", "9")
+
+        probeIds.forEach { probeId ->
+            val message = createTestMessage(probeId, 3000.0, 300.0)
+            assertDoesNotThrow {
+                roscosmosConsumer.accept(message)
             }
         }
     }
@@ -285,6 +382,38 @@ class KafkaConsumerConfigurationTest {
         assertDoesNotThrow {
             nasaConsumer.accept(nasaMessage)
             esaConsumer.accept(esaMessage)
+        }
+    }
+
+    @Test
+    fun `should process all three agency messages with same probe ID`() {
+        val probeId = "probe-shared-all"
+        val nasaMessage = createTestMessage(probeId, 1000.0, 100.0)
+        val esaMessage = createTestMessage(probeId, 2000.0, 200.0)
+        val roscosmosMessage = createTestMessage(probeId, 3000.0, 300.0)
+
+        assertDoesNotThrow {
+            nasaConsumer.accept(nasaMessage)
+            esaConsumer.accept(esaMessage)
+            roscosmosConsumer.accept(roscosmosMessage)
+        }
+    }
+
+    @Test
+    fun `should process ROSCOSMOS message and convert to verstas`() {
+        // 200 mph should convert to 100 verstas/hour (dividing by 2)
+        // 3500 feet should convert to 1 versta (dividing by 3500)
+        val telemetryData = ImperialTelemetryData(
+            maxSpeedMph = 200.0,
+            totalDistanceTraveledFeet = 3500.0
+        )
+        val message = MessageBuilder
+            .withPayload(telemetryData)
+            .setHeader(KafkaHeaders.RECEIVED_KEY, "roscosmos-conversion-test")
+            .build()
+
+        assertDoesNotThrow {
+            roscosmosConsumer.accept(message)
         }
     }
 

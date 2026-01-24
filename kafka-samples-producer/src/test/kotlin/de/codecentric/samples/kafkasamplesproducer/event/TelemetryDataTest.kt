@@ -78,6 +78,18 @@ class TelemetryDataTest {
     }
 
     @Test
+    fun `should support ROSCOSMOS space agency`() {
+        val telemetryData = TelemetryData(
+            probeId = "roscosmos-probe",
+            currentSpeedMph = 500.0,
+            traveledDistanceFeet = 5000.0,
+            spaceAgency = SpaceAgency.ROSCOSMOS
+        )
+
+        assertEquals(SpaceAgency.ROSCOSMOS, telemetryData.spaceAgency)
+    }
+
+    @Test
     fun `should have correct data class equality`() {
         val timestamp = "2024-01-01T12:00:00Z"
         val data1 = TelemetryData(

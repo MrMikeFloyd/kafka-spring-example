@@ -12,5 +12,6 @@ data class TelemetryData(
 
 enum class SpaceAgency {
     NASA,
-    ESA
+    ESA,
+    ROSCOSMOS
 }

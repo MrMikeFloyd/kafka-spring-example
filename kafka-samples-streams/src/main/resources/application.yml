@@ -13,6 +13,8 @@ spring:
           destination: space-probe-aggregate-telemetry-data-nasa
         aggregateTelemetryData-out-1:
           destination: space-probe-aggregate-telemetry-data-esa
+        aggregateTelemetryData-out-2:
+          destination: space-probe-aggregate-telemetry-data-roscosmos
       kafka:
         binder:
           brokers: "localhost:29092"
@@ -26,6 +28,9 @@ spring:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
             aggregateTelemetryData-out-1.producer:
+              keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
+              valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
+            aggregateTelemetryData-out-2.producer:
               keySerde: org.apache.kafka.common.serialization.Serdes$StringSerde
               valueSerde: com.example.kafkasamplesstreams.serdes.AggregateTelemetryDataSerde
 management:

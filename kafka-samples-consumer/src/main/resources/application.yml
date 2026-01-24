@@ -20,6 +20,11 @@ spring:
               configuration:
                 key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
                 value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
+          processRoscosmosTelemetryData-in-0:
+            consumer:
+              configuration:
+                key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+                value.deserializer: de.codecentric.samples.kafkasamplesconsumer.serdes.TelemetryDataDeserializer
       bindings:
         processNasaTelemetryData-in-0:
           group: ${spring.application.name}
@@ -27,6 +32,9 @@ spring:
         processEsaTelemetryData-in-0:
           group: ${spring.application.name}
           destination: space-probe-aggregate-telemetry-data-esa
+        processRoscosmosTelemetryData-in-0:
+          group: ${spring.application.name}
+          destination: space-probe-aggregate-telemetry-data-roscosmos
     function:
       # We define this explicitly since we have several consumer functions
-      definition: processNasaTelemetryData;processEsaTelemetryData
+      definition: processNasaTelemetryData;processEsaTelemetryData;processRoscosmosTelemetryData

@@ -66,6 +66,62 @@ class AggregationLogicIntegrationTest {
     }
 
     @Test
+    fun `should aggregate telemetry data for ROSCOSMOS probe`() {
+        val probeId = "roscosmos-probe-1"
+        val dataPoints = listOf(
+            TelemetryDataPoint(probeId, 400.0, 3500.0, SpaceAgency.ROSCOSMOS),
+            TelemetryDataPoint(probeId, 500.0, 7000.0, SpaceAgency.ROSCOSMOS),
+            TelemetryDataPoint(probeId, 450.0, 3500.0, SpaceAgency.ROSCOSMOS)
+        )
+
+        var aggregated = AggregatedTelemetryData(0.0, 0.0)
+        dataPoints.forEach { dataPoint ->
+            aggregated = kafkaStreamsHandler.updateTotals(probeId, dataPoint, aggregated)
+        }
+
+        assertEquals(500.0, aggregated.maxSpeedMph)
+        assertEquals(14000.0, aggregated.traveledDistanceFeet)
+    }
+
+    @Test
+    fun `should handle all three agencies independently`() {
+        val nasaProbe = "nasa-probe-2"
+        val esaProbe = "esa-probe-2"
+        val roscosmosProbe = "roscosmos-probe-2"
+
+        var nasaAggregated = AggregatedTelemetryData(0.0, 0.0)
+        var esaAggregated = AggregatedTelemetryData(0.0, 0.0)
+        var roscosmosAggregated = AggregatedTelemetryData(0.0, 0.0)
+
+        nasaAggregated = kafkaStreamsHandler.updateTotals(
+            nasaProbe,
+            TelemetryDataPoint(nasaProbe, 100.0, 1000.0, SpaceAgency.NASA),
+            nasaAggregated
+        )
+
+        esaAggregated = kafkaStreamsHandler.updateTotals(
+            esaProbe,
+            TelemetryDataPoint(esaProbe, 200.0, 2000.0, SpaceAgency.ESA),
+            esaAggregated
+        )
+
+        roscosmosAggregated = kafkaStreamsHandler.updateTotals(
+            roscosmosProbe,
+            TelemetryDataPoint(roscosmosProbe, 300.0, 3000.0, SpaceAgency.ROSCOSMOS),
+            roscosmosAggregated
+        )
+
+        assertEquals(100.0, nasaAggregated.maxSpeedMph)
+        assertEquals(1000.0, nasaAggregated.traveledDistanceFeet)
+
+        assertEquals(200.0, esaAggregated.maxSpeedMph)
+        assertEquals(2000.0, esaAggregated.traveledDistanceFeet)
+
+        assertEquals(300.0, roscosmosAggregated.maxSpeedMph)
+        assertEquals(3000.0, roscosmosAggregated.traveledDistanceFeet)
+    }
+
+    @Test
     fun `should track maximum speed correctly across multiple readings`() {
         val probeId = "speed-test-probe"
         val dataPoints = listOf(

@@ -26,9 +26,10 @@ class KafkaStreamsHandler {
                 KStream<String, TelemetryDataPoint>,
                 Array<KStream<String, AggregatedTelemetryData>>> { telemetryRecords ->
             telemetryRecords.branch(
-                // Split up the processing pipeline into 2 streams, depending on the space agency of the probe
+                // Split up the processing pipeline into 3 streams, depending on the space agency of the probe
                 Predicate { _, v -> v.spaceAgency == SpaceAgency.NASA },
-                Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA }
+                Predicate { _, v -> v.spaceAgency == SpaceAgency.ESA },
+                Predicate { _, v -> v.spaceAgency == SpaceAgency.ROSCOSMOS }
             ).map { telemetryRecordsPerAgency ->
                 // Apply aggregation logic on each stream separately
                 telemetryRecordsPerAgency
